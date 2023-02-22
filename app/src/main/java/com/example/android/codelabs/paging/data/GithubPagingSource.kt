@@ -20,6 +20,7 @@ class GithubPagingSource(
         val position = params.key ?: GITHUB_STARTING_PAGE_INDEX
         val apiQuery = query + IN_QUALIFIER
         return try {
+            // TODO: to handle safe response
             val response = service.searchRepos(
                 apiQuery,
                 position,

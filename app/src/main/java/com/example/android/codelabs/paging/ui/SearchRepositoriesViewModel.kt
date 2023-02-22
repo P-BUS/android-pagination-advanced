@@ -36,21 +36,18 @@ class SearchRepositoriesViewModel(
     private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
-    /**
-     * Stream of immutable states representative of the UI.
-     */
+
+    // Stream of immutable states representative of the UI.
     val state: StateFlow<UiState>
     val pagingDataFlow: Flow<PagingData<Repo>>
-
-    /**
-     * Processor of side effects from the UI which in turn feedback into [state]
-     */
+    // Processor of side effects from the UI which in turn feedback into [state]
     val accept: (UiAction) -> Unit
 
     init {
         val initialQuery: String = savedStateHandle.get(LAST_SEARCH_QUERY) ?: DEFAULT_QUERY
         val lastQueryScrolled: String = savedStateHandle.get(LAST_QUERY_SCROLLED) ?: DEFAULT_QUERY
 
+        // Reducer. We are going to reduce emissions of UiAction into UiState
         val actionStateFlow = MutableSharedFlow<UiAction>()
         val searches = actionStateFlow
             .filterIsInstance<UiAction.Search>()
@@ -90,6 +87,7 @@ class SearchRepositoriesViewModel(
                 initialValue = UiState()
             )
 
+        // All requests to the ViewModel go through a single entry point
         accept = { action ->
             viewModelScope.launch { actionStateFlow.emit(action) }
         }
@@ -121,7 +119,6 @@ data class UiState(
     val hasNotScrolledForCurrentSearch: Boolean = false
 )
 
-private const val VISIBLE_THRESHOLD: Int = 5
 private const val LAST_SEARCH_QUERY: String = "last_search_query"
 private const val DEFAULT_QUERY: String = "Android"
 private const val LAST_QUERY_SCROLLED: String = "last_query_scrolled"
